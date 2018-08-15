@@ -13,9 +13,23 @@ public class EvaluationService {
 	 * @param string
 	 * @return
 	 */
+	
+	public void swapChar(char a, char b)
+	{
+		char c = a;
+		a = b;
+		b = c;
+	}
+	
 	public String reverse(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		int len = string.length();
+		char[] charVersion = new char[len];
+		charVersion = string.toCharArray();
+		for(int i = 0; i < len / 2; i++)
+			swapChar(charVersion[i], charVersion[len - i]);
+		String stringReversed = charVersion.toString();
+		return stringReversed;
+//		return null;
 	}
 
 	/**
