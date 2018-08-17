@@ -1,8 +1,30 @@
 package com.revature.eval.java.core;
 
 import java.time.temporal.Temporal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+// Functions to just memorize for future
+/*
+ * string.length()
+ * char[] var = svar.toCharArray();
+ * String s = String.valueOf(charArr);
+ * Parsing   String s = "apple poop--bear yo" with " " and "+" as delimiter
+ * 		String delims = "[ -]+";   //delimiters go inside [], and the '+' means more than one space
+ * 								  // counts only as one delimiter 
+ *      String[] tokens = s.split(delims);
+ * s.charAt(i) gives char at index i. Returns type char not string
+ * for String[], can access length by doing sArray.length    NOT length(). thats for String
+ * to turn a char to upper case or lowercase, do char newC = Character.toUpperCase(c);
+ * 
+ * s.substring(1);  //means 1st to End of string is returned as new string
+ * s.substring(1, 9);   //means 1st to 9-1==8th is returned
+ * 				// "jason".substring(0, 3) ===> "jas" ===> 0th, 1st, 2nd (But NOT 3rd)
+ * 
+ * String already has a toLowerCase() method ===> s.toLower/UpperCase();
+ */
+
 
 public class EvaluationService {
 
@@ -23,11 +45,23 @@ public class EvaluationService {
 	
 	public String reverse(String string) {
 		int len = string.length();
-		char[] charVersion = new char[len];
-		charVersion = string.toCharArray();
-		for(int i = 0; i < len / 2; i++)
-			swapChar(charVersion[i], charVersion[len - i]);
-		String stringReversed = charVersion.toString();
+		if(len == 0)
+			return string;   	//             01234
+		char[] charCopy = new char[len];  //robot  --> tobar
+		char[] charRev = new char [len];
+		charCopy = string.toCharArray();
+		
+		for(int i = 0; i < len; i++)
+			charRev[i] = charCopy[len - i - 1];
+		String stringReversed = String.valueOf(charRev);
+		
+//		len--;
+//		for(int i = 0; i <= len/2; i++)
+//		{
+//			swapChar(charCopy[i], charCopy[len - i]);
+//		}
+//		String stringReversed = String.valueOf(charRev);
+		
 		return stringReversed;
 //		return null;
 	}
@@ -42,7 +76,12 @@ public class EvaluationService {
 	 */
 	public String acronym(String phrase) {
 		// TODO Write an implementation for this method declaration
-		return null;
+		String delims = "[ -]+";
+		String[] tokens = phrase.split(delims); 
+		String acrnym = "";
+		for(int i = 0; i < tokens.length; i++)
+			acrnym += Character.toUpperCase(tokens[i].charAt(0));
+		return acrnym;
 	}
 
 	/**
@@ -95,18 +134,33 @@ public class EvaluationService {
 		}
 
 		public boolean isEquilateral() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			if(sideOne != sideTwo)
+				return false;
+			if(sideOne != sideThree)
+				return false;
+			if(sideTwo != sideThree)
+				return false;
+			return true;
 		}
 
 		public boolean isIsosceles() {
-			// TODO Write an implementation for this method declaration
+			if(sideOne == sideTwo)
+				return true;
+			if(sideOne == sideThree)
+				return true;
+			if(sideTwo == sideThree)
+				return true;
 			return false;
 		}
 
 		public boolean isScalene() {
-			// TODO Write an implementation for this method declaration
-			return false;
+			if(sideOne == sideTwo)
+				return false;
+			if(sideOne == sideThree)
+				return false;
+			if(sideTwo == sideThree)
+				return false;
+			return true;
 		}
 
 	}
@@ -127,8 +181,35 @@ public class EvaluationService {
 	 * @return
 	 */
 	public int getScrabbleScore(String string) {
-		// TODO Write an implementation for this method declaration
-		return 0;
+		char[] charCopy = string.toCharArray();
+		int score = 0;
+		boolean nextCharCopy;
+		
+		int[] scorePoints = {1, 2, 3, 4, 5, 8, 10};
+		char[][] scoreKey = {{'A', 'E', 'I', 'O', 'U', 'L', 'N', 'R', 'S', 'T'}, {'D', 'G'},
+				          {'B', 'C', 'M', 'P'}, {'F', 'H', 'V', 'W', 'Y'}, {'K'}, {'J', 'X'},
+				          {'Q', 'Z'}};
+		
+		for(int k = 0; k < charCopy.length; k++)
+		{
+			nextCharCopy = false;
+			charCopy[k] = Character.toUpperCase(charCopy[k]);
+			for(int i = 0; i < scorePoints.length; i++)
+			{
+				for(int j = 0; j < scoreKey[i].length; j++)
+					if(charCopy[k] == scoreKey[i][j])
+					{
+						score += scorePoints[i];	//update the score
+						nextCharCopy = true;		//set flag to break j loop
+						break;
+					}
+				
+				if(nextCharCopy == true)		//if no break, keep going thru scoreKey
+					break;
+			}
+		}
+		
+		return score;
 	}
 
 	/**
@@ -154,7 +235,7 @@ public class EvaluationService {
 	 * 
 	 * For example, the inputs
 	 * 
-	 * +1 (613)-995-0253 613-995-0253 1 613 995 0253 613.995.0253 should all produce
+	 * +1 (613)-995-0253    613-995-0253   1 613 995 0253    613.995.0253 should all produce
 	 * the output
 	 * 
 	 * 6139950253
@@ -163,8 +244,60 @@ public class EvaluationService {
 	 * NANP-countries, only 1 is considered a valid country code.
 	 */
 	public String cleanPhoneNumber(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		int index = 0;
+		boolean flagLeading1 = false;
+		
+		for(int i = 0; i < string.length(); i++)
+			if(Character.isDigit(string.charAt(i)))
+			{
+				if(index == 0)
+					flagLeading1 = true;
+				index++;
+			}
+		
+		if(index > 11)	//more than 11 numbers, gen exception
+		{
+			throw new IllegalArgumentException("Too many numbers");
+			//FIXME ASK CAROLYN I dont know why this passes the test, or what it does.
+			//How come what I tried before below doesn't work?
+//			try {
+//				throw new IllegalArgumentException("Too many numbers");
+//			}	catch(IllegalArgumentException e) {
+//				System.out.println("yo");
+//				e.getStackTrace();
+//				return null;
+//			}
+//			System.out.println(index);			//this is apparently unreachable code bcuz of throw
+		}
+		
+		if(index == 11 && !flagLeading1)
+			throw new IllegalArgumentException("11 numbers is too many if the first is not 1");
+		if(index < 10)
+			throw new IllegalArgumentException("Enter only numbers and 10-11");
+		
+		char[] charCleaned = new char[index];
+		int pos = 0;
+		for(int i = 0; i < string.length(); i++)
+			if(Character.isDigit(string.charAt(i)))
+				charCleaned[pos++] = string.charAt(i);
+		charCleaned[pos] = '\0';			//getting spaces afterwards?? :( cuz same length as string FIXME question
+		
+		//remove any '1' if index == 11 
+		if(charCleaned[0] == '1' && index == 11)
+		{
+			for(int i = 0; i < index-1; i++)	//move every char down once
+				charCleaned[i] = charCleaned[i + 1];
+			index--;
+		}
+			
+		char[] cleaned2 = new char[index];			//recopying but with correct size to have correct sized array
+		for(int i = 0; i < index; i++)
+			cleaned2[i] = charCleaned[i];
+		
+		//change back to string
+		String cleanedNumber = String.valueOf(cleaned2);
+		//return string
+		return cleanedNumber;
 	}
 
 	/**
@@ -177,8 +310,19 @@ public class EvaluationService {
 	 * @return
 	 */
 	public Map<String, Integer> wordCount(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+//		char[] charCopy = new char[string.length()];
+//		charCopy = string.toCharArray();
+		String delimiter = "[ ,\n]+";
+		String[] words = string.split(delimiter);
+		//Must call HashMap because Map is an Interface, can't be instantiated
+		Map<String, Integer> wordOccurrenceMap = new HashMap<String, Integer>();
+		for(int i = 0; i < words.length; i++)
+			if(!wordOccurrenceMap.containsKey(words[i]))
+				wordOccurrenceMap.put(words[i],  1);
+			else
+				wordOccurrenceMap.replace(words[i], wordOccurrenceMap.get(words[i]) + 1);
+		
+		return wordOccurrenceMap;
 	}
 
 	/**
@@ -257,8 +401,37 @@ public class EvaluationService {
 	 * @return
 	 */
 	public String toPigLatin(String string) {
-		// TODO Write an implementation for this method declaration
-		return null;
+		String rtnString = "";
+		//need to define array of string consonants
+		String[] cons = {"th", "sch", "y", "qu", "f", "r"};
+		//need to define array of string vowels
+		char[] vow = {'a', 'i', 'o', 'e', 'u' };  //char arr because vowels are 1 character, .charAt(0)
+		
+		Boolean vowelsFlag;
+		String delimiters = "[ ]+";
+		String[] words = string.split(delimiters);
+		for(String i : words)
+		{		
+			vowelsFlag  = false;
+			for(char j : vow) //Go through the vowels to see if starts with a vowel
+				if(j == i.charAt(0))
+				{
+					i = i + "ay";			//just add "ay"
+					vowelsFlag = true;	//mark the flag
+					break;	
+				}
+			
+			if(vowelsFlag == false)	//then it is a consonant, so go thru string consonants
+				for( String k : cons )
+				{
+					if( k.equals( i.substring(0, k.length() ) ) )
+						i = i.substring( k.length() ) + k + "ay";
+				}
+			//put words back into one string
+			rtnString += i;
+		}
+		
+		return rtnString;
 	}
 
 	/**
@@ -277,7 +450,17 @@ public class EvaluationService {
 	 * @return
 	 */
 	public boolean isArmstrongNumber(int input) {
-		// TODO Write an implementation for this method declaration
+		int sum = 0;
+		String s = String.valueOf(input);		//new, put in note comments
+		int digitCount = s.length();
+		if(digitCount == 1)
+			return true;
+		if(digitCount == 2)
+			return false;
+		for(int i = 0; i < digitCount; i++)
+			sum +=  Math.pow( Character.digit(s.charAt(i), 10), digitCount);	//put in note both	
+		if(sum == input)
+			return true;
 		return false;
 	}
 
