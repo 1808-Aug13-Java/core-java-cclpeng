@@ -488,13 +488,14 @@ public class EvaluationService {
 		Boolean vowelsFlag;
 		String delimiters = "[ ]+";
 		String[] words = string.split(delimiters);
-		for(String i : words)
+		int i;
+		for(i = 0; i < words.length; i++ )
 		{		
 			vowelsFlag  = false;
 			for(char j : vow) //Go through the vowels to see if starts with a vowel
-				if(j == i.charAt(0))
+				if(j == words[i].charAt(0))
 				{
-					i = i + "ay";			//just add "ay"
+					words[i] = words[i] + "ay";			//just add "ay"
 					vowelsFlag = true;	//mark the flag
 					break;	
 				}
@@ -502,12 +503,16 @@ public class EvaluationService {
 			if(vowelsFlag == false)	//then it is a consonant, so go thru string consonants
 				for( String k : cons )
 				{
-					if( k.equals( i.substring(0, k.length() ) ) )
-						i = i.substring( k.length() ) + k + "ay";
+					if( k.equals( words[i].substring(0, k.length() ) ) )
+						words[i] = words[i].substring( k.length() ) + k + "ay";
 				}
 			//put words back into one string
-			rtnString += i;
+			if(i < words.length - 1)
+				rtnString += words[i] + " ";
+			else
+				rtnString += words[i];
 		}
+		
 		
 		return rtnString;
 	}
